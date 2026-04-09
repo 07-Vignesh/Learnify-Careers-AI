@@ -46,12 +46,6 @@
 
 ---
 
-## 📸 Demo
-
-🔗 Live Demo: *Add your link*  
-📂 Repository: *Add your repo link*
-
----
 
 ## ⚙️ Environment Variables
 
