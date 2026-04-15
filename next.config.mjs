@@ -12,6 +12,12 @@ const nextConfig = {
       },
     ],
   },
+
+  logging: {
+    fetches: {
+      fullUrl: false, // hides full fetch logs
+    },
+  },
 };
 
 export default nextConfig;

@@ -1,3 +1,5 @@
+"use client"
+
 import mentors from "../../data/mentors";
 import MentorCard from "../../components/ui/mentor-card";
 

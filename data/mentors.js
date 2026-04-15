@@ -122,7 +122,7 @@ const mentors = [
     gender: "Male",
     date_of_birth: "1983-11-12",
     location: "San Francisco, California, United States",
-    profile_picture_url: "/p7.jpg",
+    profile_picture_url: "/p8.png",
     contact: {
       email: "steve.huffman@example.com",
       phone: "+1-415-555-0123",

@@ -5,21 +5,19 @@ import Link from 'next/link'
 import React from 'react'
 import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
-import { checkUser } from '@/lib/checkUser'
 
-const Header = async() => {
-    await checkUser();
+const Header = () => {
 
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60">
-      <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/">
+      <nav className="container mx-auto p-2 h-20 flex items-center justify-between">
+        <Link href="/" className="-ml-6">
           <Image
-            src={"/logo 5.png"}
-            alt="LinkEd Logo"
-            width={200}
-            height={60}
-            className="h-20 py-1 w-auto object-contain"
+            src={"/learnfi.png"}
+            alt="Learnify Careers AI Logo"
+            width={400}
+            height={250}
+            className="h-32 w-auto object-contain"
           />
         </Link>
 
