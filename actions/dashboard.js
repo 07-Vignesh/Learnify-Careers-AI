@@ -1,9 +1,8 @@
 "use server";
 
 import { db } from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getAuthUser } from "@/lib/authHelpers";
-import { inngest } from "@/lib/inngest/client";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -34,63 +33,52 @@ export const generateAIInsights = async (industry) => {
   const text = response.text();
   const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
 
+  // return JSON.parse(cleanedText);
+
   const insights = JSON.parse(cleanedText);
 
   // Ensure the demandLevel is capitalized correctly
   if (insights.demandLevel) {
-    insights.demandLevel = insights.demandLevel.toUpperCase();
+    insights.demandLevel = insights.demandLevel.toUpperCase(); // Convert to uppercase (HIGH, MEDIUM, LOW)
   }
 
   // Ensure the marketOutlook is capitalized correctly
   if (insights.marketOutlook) {
-    insights.marketOutlook = insights.marketOutlook.toUpperCase();
+    insights.marketOutlook = insights.marketOutlook.toUpperCase(); // Convert to uppercase (POSITIVE, NEGATIVE, STABLE)
   }
 
   return insights;
+
+  
 };
 
 export async function getIndustryInsights() {
-  const user = await getAuthUser();
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
 
-  let industryInsight = await db.industryInsight.findFirst({
-    where: {
-      industry: user.industry,
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+    include: {
+      industryInsight: true,
     },
   });
 
-  // If no insights exist, trigger background job and return null or default data
-  if (!industryInsight) {
-    // ✨ TRIGGER BACKGROUND JOB - doesn't block page load
-    inngest.send({
-      name: "generate.industry.insights",
+  if (!user) throw new Error("User not found");
+
+  // If no insights exist, generate them
+  if (!user.industryInsight) {
+    const insights = await generateAIInsights(user.industry);
+
+    const industryInsight = await db.industryInsight.create({
       data: {
         industry: user.industry,
+        ...insights,
+        nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
-    }).catch((err) => console.error("Failed to queue insight generation:", err));
+    });
 
-    // Return empty structure immediately so page loads fast
-    return {
-      industry: user.industry,
-      salaryRanges: [],
-      growthRate: 0,
-      demandLevel: "MEDIUM",
-      topSkills: [],
-      marketOutlook: "NEUTRAL",
-      keyTrends: [],
-      recommendedSkills: [],
-      nextUpdate: null,
-    };
+    return industryInsight;
   }
 
-  // If insights are expired, trigger refresh in background (non-blocking)
-  if (new Date(industryInsight.nextUpdate) < new Date()) {
-    inngest.send({
-      name: "generate.industry.insights",
-      data: {
-        industry: user.industry,
-      },
-    }).catch((err) => console.error("Failed to queue insight refresh:", err));
-  }
-
-  return industryInsight;
+  return user.industryInsight;
 }

@@ -13,11 +13,11 @@ const Header = () => {
       <nav className="container mx-auto p-2 h-20 flex items-center justify-between">
         <Link href="/" className="-ml-6">
           <Image
-            src={"/learnfi.png"}
+            src={"/mainlogo.png"}
             alt="Learnify Careers AI Logo"
             width={400}
             height={250}
-            className="h-32 w-auto object-contain"
+            className="h-32 w-auto object-contain mt-2"
           />
         </Link>
 

@@ -6,7 +6,7 @@ import { getAuthUser } from "@/lib/authHelpers";
 export async function matchMentors(studentProfile) {
   const user = await getAuthUser();
 
-  // Trigger background mentor matching - doesn't block
+  // Trigger background mentor matching - doesn't blocka
   inngest.send({
     name: "match.mentors",
     data: {
